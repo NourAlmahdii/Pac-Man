@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Pac-Man Character Designer</title>
+  
+</head>
+<body>
+  <div id="container">
+    <h1>Pac-Man Character Designer</h1>
+    <canvas id="design-canvas" width="400" height="400"></canvas>
+    
+    <div class="controls">
+      <div class="control-group">
+        <label>Body Color: <input type="color" id="colorPicker" value="#ffff00"></label>
+      </div>
+      <div class="control-group">
+        <label>Eye Size: <input type="range" id="eyeSize" min="5" max="20" value="12"></label>
+      </div>
+      <div class="control-group">
+        <label>Mouth Size: <input type="range" id="mouthSize" min="10" max="60" value="35"></label>
+      </div>
+      <button id="startGame">Start Game</button>
+    </div>
+  </div>
+
+  <script src="design.js"></script>
+</body>
+</html>
+
+<style>
+    body { margin:0; background:#222; color:white; font-family:sans-serif; }
+    #container { display:flex; flex-direction:column; align-items:center; padding:20px; }
+    canvas { background:#fff; border:2px solid #000; margin:10px; }
+    .controls { background:rgba(0,0,0,0.7); padding:15px; border-radius:8px; margin:10px; }
+    .control-group { margin:10px 0; }
+    button { padding:8px 16px; margin:5px; background:#ff0; border:none; border-radius:4px; cursor:pointer; }
+    #colorPicker { width:50px; height:30px; }
+    button:hover { background:rgb(251, 251, 148);}
+  </style>
