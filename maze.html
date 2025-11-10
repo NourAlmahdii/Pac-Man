@@ -310,6 +310,24 @@
       font-size: 14px;
       z-index: 10;
     }
+
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timer-label {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .timer-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff0;
+    }
+
   </style>
 </head>
 <body>
@@ -322,6 +340,12 @@
       
       <div class="title">PAC-MAN</div>
       
+      <div class="timer-container">
+        <div class="timer-label">TIME</div>
+        <div class="timer-value" id="timer">60</div>
+      </div>
+
+
       <div class="lives-container">
         <div class="lives-label">LIVES</div>
         <div class="lives" id="lives">
@@ -426,8 +450,7 @@
       
       // Add pause functionality
       document.getElementById('pauseGame').addEventListener('click', function() {
-        // This would need to be implemented in the game logic
-        alert('Pause functionality would be implemented here');
+        alert('game paused');
       });
     });
   </script>

@@ -17,11 +17,19 @@ class MazeGame {
     this.winMessage = document.getElementById("winMessage");
     this.finalScoreEl = document.getElementById("finalScore");
     this.playAgainButton = document.getElementById("playAgain");
-    
+    this.restartButton = document.getElementById("restartGame"); // in game over screen
     
     // Game state
     this.gameActive = true;
     
+    this.timerEl = document.getElementById("timer");
+    this.gameOverEl = document.getElementById("gameOver");
+    this.finalScoreGameOverEl = document.getElementById("finalScoreGameOver");
+    this.restartButton = document.getElementById("restartGame");
+    this.timeLeft = 60; // 60 seconds
+    this.timerInterval = null;
+
+
     // Load Pac-Man design from storage
     this.pacmanDesign = JSON.parse(localStorage.getItem('pacmanDesign')) || {
       color: "#ffff00",
@@ -103,7 +111,14 @@ class MazeGame {
       this.resetGame();
     });
 
+    this.restartButton.addEventListener("click", () => {
+      this.resetGame();
+    });
+
+
     this.render();
+    this.startTimer();
+
   }
 
   // Count remaining dots
@@ -124,10 +139,30 @@ class MazeGame {
   checkWinCondition() {
     const remainingDots = this.getRemainingDots();
     if (remainingDots === 0 && this.gameActive) {
-      this.gameActive = false;
-      this.showWinMessage();
+      this.endGame(true);
     }
   }
+
+  startTimer() {
+    // Reset timer
+    this.timeLeft = 75;
+    if (this.timerEl) this.timerEl.textContent = this.timeLeft;
+
+    // Clear any old timer
+    if (this.timerInterval) clearInterval(this.timerInterval);
+
+    // Start countdown
+    this.timerInterval = setInterval(() => {
+      if (!this.gameActive) return; // Pause if game stopped
+      this.timeLeft--;
+      if (this.timerEl) this.timerEl.textContent = this.timeLeft;
+
+      if (this.timeLeft <= 0) {
+        this.endGame(false); // lose condition
+      }
+    }, 1000);
+  }
+
 
   // Show winning message
   showWinMessage() {
@@ -142,11 +177,36 @@ class MazeGame {
     console.log("🎉 Congratulations! You collected all dots! 🎉");
   }
 
+  endGame(won) {
+  this.gameActive = false;
+  clearInterval(this.timerInterval);
+
+  if (won) {
+    this.showWinMessage();
+  } else {
+    this.showGameOver();
+  }
+}
+
+showGameOver() {
+  if (this.finalScoreGameOverEl) {
+    this.finalScoreGameOverEl.textContent = this.score;
+  }
+  if (this.gameOverEl) {
+    this.gameOverEl.style.display = 'block';
+  }
+  console.log("💀 Time’s up! Game Over.");
+}
+
   // Reset game to play again
   resetGame() {
     if (this.winMessage) {
       this.winMessage.style.display = 'none';
     }
+
+    if (this.winScreenEl) this.winScreenEl.style.display = "none";
+    if (this.gameOverEl) this.gameOverEl.style.display = "none";
+
     this.gameActive = true;
     this.score = 0;
     if (this.scoreEl) {
@@ -155,10 +215,12 @@ class MazeGame {
     
     // Reset Pac-Man position
     this.pac.x = -0.8;
-    this.pac.y = 0.0;
+    this.pac.y = 0.05;
     this.pac.dirX = 0;
     this.pac.dirY = 0;
     
+    this.startTimer();
+
     // Regenerate dots
     this.dots = this.generateDots();
     this.updateDotsLeft();
