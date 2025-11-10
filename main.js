@@ -15,6 +15,8 @@ class WebGLSetup {
     
     // Start the game once WebGL is ready
     new MazeGame(this);
+
+  MazeGame.setInstance(mazeGame);
   }
   
   compileShader(id, type) {

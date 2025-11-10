@@ -8,13 +8,16 @@ class MazeGame {
     this.posLoc = webglSetup.posLoc;
     this.uColor = webglSetup.uColor;
     this.buffer = webglSetup.buffer;
+    this.canvas = webglSetup.canvas;
     
+    // HTML elements
     this.scoreEl = document.getElementById("score");
     this.dotsLeftEl = document.getElementById("dotsLeft");
     this.backButton = document.getElementById("backToDesign");
     this.winMessage = document.getElementById("winMessage");
     this.finalScoreEl = document.getElementById("finalScore");
     this.playAgainButton = document.getElementById("playAgain");
+    
     
     // Game state
     this.gameActive = true;
@@ -43,48 +46,55 @@ class MazeGame {
   
   init() {
     // Grid size
-    this.cols = 30;
-    this.rows = 15;
+    this.cols = 40;
+    this.rows = 20;
     this.cellW = 2 / this.cols;
     this.cellH = 2 / this.rows;
 
     // Maze grid: 1 = wall, 0 = path
     this.grid = [
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1],
-      [1,0,1,1,1,0,0,1,0,1,0,1,0,1,1,0,1,0,1,0,1,1,1,1,1,1,1,0,0,1],
-      [1,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,0,1,1],
-      [1,0,1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,0,0,1,0,0,1],
-      [1,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,1,1,0,1],
-      [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,1,0,0,0,0,0,1],
-      [1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,1,1,1,0,1],
-      [1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,0,0,0,1,0,1],
-      [1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,1],
-      [1,0,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,0,1,1,1,0,1],
-      [1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1],
-      [1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],  
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    ];
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1],
+    [1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
 
     this.wallVertices = this.buildWalls();
     this.wallVertexCount = this.wallVertices.length / 2;
 
     // Pac-Man initial state
     this.pac = {
-      x: -0.8, y: 0.0,
-      r: Math.min(this.cellW, this.cellH) * 0.42,
-      speed: 0.0080,
+      x: -0.8, y: 0.05,
+      r: Math.min(this.cellW, this.cellH) * 0.48,
+      speed: 0.0050,
       dirX: 0, dirY: 0,
       mouth: 0.35, mouthDir: 1
     };
+
+    this.movement = new MovementController(this);
 
     this.dots = this.generateDots();
     this.score = 0;
     this.scoreEl.textContent = this.score;
     this.updateDotsLeft();
 
-    this.setupControls();
+    //this.setupControls();
     this.backButton.addEventListener("click", () => {
       window.location.href = "design.html";
     });
@@ -155,8 +165,8 @@ class MazeGame {
   }
 
   buildWalls() {
-    const wallPaddingX = this.cellW * 0.12;
-    const wallPaddingY = this.cellH * 0.12;
+    const wallPaddingX = this.cellW * 0.0001;
+    const wallPaddingY = this.cellH * 0.0001;
     let wallVertices = [];
     
     for (let r = 0; r < this.rows; r++) {
@@ -194,26 +204,7 @@ class MazeGame {
     return dots;
   }
 
-  setupControls() {
-    const keys = {};
-    window.addEventListener("keydown", (e) => {
-      if (!this.gameActive) return; // Don't process movement if game is over
-      keys[e.key] = true; 
-      this.updateDirection(keys);
-    });
-    window.addEventListener("keyup", (e) => {
-      keys[e.key] = false; 
-      this.updateDirection(keys);
-    });
-  }
-
-  updateDirection(keys) {
-    if (keys["ArrowLeft"]) { this.pac.dirX = -1; this.pac.dirY = 0; return; }
-    if (keys["ArrowRight"]) { this.pac.dirX = 1; this.pac.dirY = 0; return; }
-    if (keys["ArrowUp"]) { this.pac.dirX = 0; this.pac.dirY = 1; return; }
-    if (keys["ArrowDown"]) { this.pac.dirX = 0; this.pac.dirY = -1; return; }
-    this.pac.dirX = 0; this.pac.dirY = 0;
-  }
+  
 
   cellRect(c, r) {
     const left = -1 + c * this.cellW;
@@ -241,7 +232,7 @@ class MazeGame {
       for (let c = minC; c <= maxC; c++) {
         if (this.grid[r][c] === 1) {
           let rect = this.cellRect(c, r);
-          const padX = this.cellW * 0.08, padY = this.cellH * 0.08;
+          const padX = this.cellW * 0.02, padY = this.cellH * 0.02;
           const rectP = { 
             left: rect.left + padX, 
             right: rect.right - padX, 
@@ -274,7 +265,7 @@ class MazeGame {
 
   drawDot(dot) {
     const gl = this.gl;
-    const fan = this.createCircleFan(dot.x, dot.y, 0.02, 20);
+    const fan = this.createCircleFan(dot.x, dot.y, 0.01, 20);
     gl.bufferData(gl.ARRAY_BUFFER, fan, gl.STATIC_DRAW);
     gl.uniform4f(this.uColor, 1.0, 0.0, 0.0, 1.0); // Red dots
     gl.drawArrays(gl.TRIANGLE_FAN, 0, fan.length/2);
@@ -283,38 +274,42 @@ class MazeGame {
   drawPac() {
     const gl = this.gl;
     const pac = this.pac;
-    
+
     let face = 0; 
     if (pac.dirX !== 0 || pac.dirY !== 0) {
       face = Math.atan2(pac.dirY, pac.dirX);
     }
-    
-    const start = face + pac.mouth/2;
-    const end = face - pac.mouth/2 + 2 * Math.PI;
+
+    // Mouth / body
+    const start = face + pac.mouth / 2;
+    const end = face - pac.mouth / 2 + 2 * Math.PI;
     const fan = this.createCircleFan(pac.x, pac.y, pac.r, 36, start, end);
-    
+
     gl.bufferData(gl.ARRAY_BUFFER, fan, gl.STATIC_DRAW);
     gl.uniform4f(this.uColor, this.pacmanColor.r, this.pacmanColor.g, this.pacmanColor.b, 1.0);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, fan.length/2);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, fan.length / 2);
 
     // Eye
     const eyeOffset = { 
-      x: Math.cos(face) * pac.r * 0.35 - Math.sin(face) * pac.r * 0.25,
-      y: Math.sin(face) * pac.r * 0.35 + Math.cos(face) * pac.r * 0.25 
+      x: Math.cos(face) * pac.r * 0.25 - Math.sin(face) * pac.r * 0.15,
+      y: Math.sin(face) * pac.r * 0.25 + Math.cos(face) * pac.r * 0.15
     };
-    
-    const eyeSize = (this.pacmanDesign.eyeSize / 12) * (pac.r * 0.12);
+    const eyeSize = (this.pacmanDesign.eyeSize / 12) * (pac.r * 0.1);
     const eye = this.createCircleFan(pac.x + eyeOffset.x, pac.y + eyeOffset.y, eyeSize, 14);
+
     gl.bufferData(gl.ARRAY_BUFFER, eye, gl.STATIC_DRAW);
     gl.uniform4f(this.uColor, 0.0, 0.0, 0.0, 1.0);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, eye.length/2);
+    gl.drawArrays(gl.TRIANGLE_FAN, 0, eye.length / 2);
   }
+
 
   render() {
     const gl = this.gl;
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     this.drawWalls();
+
+    if (this.movement) this.movement.tryTurn(); 
 
     // Only update game if it's active
     if (this.gameActive) {
@@ -323,14 +318,17 @@ class MazeGame {
       if (this.pac.mouth > 0.9) this.pac.mouthDir = -1;
       if (this.pac.mouth < 0.18) this.pac.mouthDir = 1;
 
-      // Movement
+      // Movement (aspect-corrected)
       let vx = this.pac.dirX;
       let vy = this.pac.dirY;
       if (vx !== 0 || vy !== 0) {
         const len = Math.hypot(vx, vy);
-        vx = (vx/len) * this.pac.speed;
-        vy = (vy/len) * this.pac.speed;
+        vx = (vx / len) * this.pac.speed;
+        vy = (vy / len) * this.pac.speed * (this.canvas.width / this.canvas.height);
+
+        vy *= this.cols / this.rows *0.75; // Adjust for grid aspect ratio
       }
+
 
       // Axis-separated movement for sliding
       const tryX = this.pac.x + vx;
