@@ -4,70 +4,419 @@
   <meta charset="utf-8" />
   <title>Pac-Man Maze Game</title>
   <style>
-    body { margin:0; height:100vh; display:flex; align-items:center; justify-content:center; background:#222; }
-    canvas { background:#fff; width:1000px; height:500px; image-rendering:crisp-edges; border:6px solid #000; }
-    #hud {
-      position: absolute; top: 12px; left: 12px; color: #fff; font-family: sans-serif;
-      background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    #menu {
-      position: absolute; top: 12px; right: 12px; color: #fff; font-family: sans-serif;
-      background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px;
+    
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
     }
-    button { background:rgb(0, 0, 0); border:none; padding:5px 10px; margin-left:5px; border-radius:3px; cursor:pointer; color:#fff;}
-    button:hover { background:rgba(255,255,255,0.2); }  
-
+    
+    .game-container {
+      position: relative;
+      width: 1000px;
+      height: 700px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: #000;
+      color: #ff0;
+      border-bottom: 2px solid #ff0;
+      margin-bottom: 10px;
+    }
+    
+    .score-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .score-label {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    
+    .score-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .title {
+      font-size: 42px;
+      font-weight: bold;
+      color: #ff0;
+      text-shadow: 0 0 10px #ff0, 0 0 20px #ff0;
+      letter-spacing: 2px;
+    }
+    
+    .lives-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .lives-label {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    
+    .lives {
+      display: flex;
+    }
+    
+    .life {
+      width: 25px;
+      height: 25px;
+      background: #ff0;
+      border-radius: 50%;
+      margin-right: 5px;
+      position: relative;
+    }
+    
+    .life::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 12px;
+      width: 8px;
+      height: 8px;
+      background: #000;
+      border-radius: 50%;
+    }
+    
+    .game-area {
+      position: relative;
+      width: 1000px;
+      height: 500px;
+      background: #000;
+      border: 4px solid #0000ff;
+      box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
+      overflow: hidden;
+    }
+    
+    canvas {
+      background: #000;
+      width: 100%;
+      height: 100%;
+      image-rendering: crisp-edges;
+    }
+    
+    .controls {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: #000;
+      color: #fff;
+      border-top: 2px solid #ff0;
+      margin-top: 10px;
+    }
+    
+    .dots-info {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+    }
+    
+    .dots-label {
+      margin-right: 10px;
+    }
+    
+    .dots-value {
+      font-weight: bold;
+      color: #ff0;
+    }
+    
+    .menu-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      background: #ff0;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      transition: all 0.3s;
+      box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+    }
+    
+    button:hover {
+      background: #ffcc00;
+      transform: scale(1.05);
+    }
+    
+    /* Power mode indicator */
+    #powerMode {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 255, 0.8);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      display: none;
+      z-index: 50;
+      box-shadow: 0 0 20px rgba(0, 0, 255, 0.7);
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+    
     /* Win message styles */
     #winMessage {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.95);
       color: #ff0;
-      padding: 30px 50px;
-      border-radius: 15px;
+      padding: 40px 60px;
+      border-radius: 20px;
       text-align: center;
-      font-family: sans-serif;
-      font-size: 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 36px;
       font-weight: bold;
       border: 4px solid #ff0;
-      box-shadow: 0 0 30px rgba(255, 255, 0, 0.5);
+      box-shadow: 0 0 40px rgba(255, 255, 0, 0.7);
       display: none;
       z-index: 100;
     }
     
+    #winMessage div:first-child {
+      margin-bottom: 20px;
+      font-size: 42px;
+    }
+    
     #winMessage button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 18px;
+      margin-top: 25px;
+      padding: 12px 25px;
+      font-size: 20px;
       background: #ff0;
       color: #000;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
     }
     
     #winMessage button:hover {
       background: #ffcc00;
     }
+    
+    /* Game over message */
+    #gameOver {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      color: #f00;
+      padding: 40px 60px;
+      border-radius: 20px;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      font-size: 36px;
+      font-weight: bold;
+      border: 4px solid #f00;
+      box-shadow: 0 0 40px rgba(255, 0, 0, 0.7);
+      display: none;
+      z-index: 100;
+    }
+    
+    #gameOver div:first-child {
+      margin-bottom: 20px;
+      font-size: 42px;
+    }
+    
+    #gameOver button {
+      margin-top: 25px;
+      padding: 12px 25px;
+      font-size: 20px;
+      background: #f00;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    #gameOver button:hover {
+      background: #ff4444;
+    }
+    
+    /* Ghost info panel */
+    .ghost-info {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 10;
+    }
+    
+    .ghost-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    
+    .ghost-color {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    /* Instructions */
+    .instructions {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 10;
+    }
+
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timer-label {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .timer-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ff0;
+    }
+
   </style>
 </head>
 <body>
-  <div id="hud">Score: <span id="score">0</span> | Dots Left: <span id="dotsLeft">0</span></div>
-  <div id="menu">
-    <button id="backToDesign">Back to Designer</button>
+  <div class="game-container">
+    <div class="header">
+      <div class="score-container">
+        <div class="score-label">SCORE</div>
+        <div class="score-value" id="score">0</div>
+      </div>
+      
+      <div class="title">PAC-MAN</div>
+      
+      <div class="timer-container">
+        <div class="timer-label">TIME</div>
+        <div class="timer-value" id="timer">60</div>
+      </div>
+
+
+      <div class="lives-container">
+        <div class="lives-label">LIVES</div>
+        <div class="lives" id="lives">
+          <!-- Lives will be added by JavaScript -->
+        </div>
+      </div>
+    </div>
+    
+    <div class="game-area">
+      <canvas id="game-canvas" width="1000" height="500"></canvas>
+      
+      <!-- Power Mode Indicator -->
+      <div id="powerMode">POWER MODE ACTIVE!</div>
+      
+      <!-- Win Message Popup -->
+      <div id="winMessage">
+        <div>🎉 YOU WIN! 🎉</div>
+        <div style="font-size: 24px; margin-top: 10px;">All dots collected!</div>
+        <div style="font-size: 20px; margin-top: 15px;">Final Score: <span id="finalScore">0</span></div>
+        <button id="playAgain">Play Again</button>
+      </div>
+      
+      <!-- Game Over Message -->
+      <div id="gameOver">
+        <div>GAME OVER</div>
+        <div style="font-size: 24px; margin-top: 10px;">Better luck next time!</div>
+        <div style="font-size: 20px; margin-top: 15px;">Final Score: <span id="finalScoreGameOver">0</span></div>
+        <button id="restartGame">Play Again</button>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <div class="dots-info">
+        <div class="dots-label">DOTS LEFT:</div>
+        <div class="dots-value" id="dotsLeft">0</div>
+      </div>
+      
+      <div class="menu-buttons">
+        <button id="backToDesign">Back to Designer</button>
+        <button id="pauseGame">Pause Game</button>
+      </div>
+    </div>
   </div>
-  
-  <!-- Win Message Popup -->
-  <div id="winMessage">
-    <div>🎉 YOU WIN! 🎉</div>
-    <div style="font-size: 24px; margin-top: 10px;">All dots collected!</div>
-    <div style="font-size: 20px; margin-top: 15px;">Final Score: <span id="finalScore">0</span></div>
-    <button id="playAgain">Play Again</button>
+
+  <!-- Bottom info panels -->
+  <div style="width:100vw; display:flex; justify-content:center; align-items:flex-end; position:fixed; left:0; bottom:0; z-index:100; pointer-events:none;">
+    <div class="ghost-info" style="position:static; margin:20px; pointer-events:auto;">
+      <div style="margin-bottom: 8px; font-weight: bold;">GHOSTS</div>
+      <div class="ghost-item">
+        <div class="ghost-color" style="background: #ff0000;"></div>
+        <div>Blinky - Chases you</div>
+      </div>
+      <div class="ghost-item">
+        <div class="ghost-color" style="background: #ffb8ff;"></div>
+        <div>Pinky - Ambushes you</div>
+      </div>
+      <div class="ghost-item">
+        <div class="ghost-color" style="background: #00ffff;"></div>
+        <div>Inky - Unpredictable</div>
+      </div>
+      <div class="ghost-item">
+        <div class="ghost-color" style="background: #ffb852;"></div>
+        <div>Clyde - Random when close</div>
+      </div>
+    </div>
+    <div class="instructions" style="position:static; margin:20px; pointer-events:auto;">
+      <div style="margin-bottom: 5px; font-weight: bold;">CONTROLS</div>
+      <div>Arrow Keys - Move Pac-Man</div>
+      <div>Collect Power Pellets to eat ghosts!</div>
+    </div>
   </div>
-  
-  <canvas id="game-canvas" width="1000" height="500"></canvas>
 
   <!-- Add shaders directly in HTML to avoid 404 errors -->
   <script id="vertex-shader" type="x-shader/x-vertex">
@@ -86,6 +435,24 @@
   </script>
 
   <script src="main.js"></script>
+  <script src="movement.js"></script>
   <script src="maze.js"></script>
+  
+  <script>
+    // Initialize lives display
+    document.addEventListener('DOMContentLoaded', function() {
+      const livesContainer = document.getElementById('lives');
+      for (let i = 0; i < 3; i++) {
+        const life = document.createElement('div');
+        life.className = 'life';
+        livesContainer.appendChild(life);
+      }
+      
+      // Add pause functionality
+      document.getElementById('pauseGame').addEventListener('click', function() {
+        alert('game paused');
+      });
+    });
+  </script>
 </body>
 </html>
