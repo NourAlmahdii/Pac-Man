@@ -36,9 +36,9 @@ class MazeGame {
     this.difficulty = localStorage.getItem('pacmanDifficulty') || 'medium'; // 'easy', 'medium', 'hard'
 
     this.difficultySettings = {
-    easy: { dotSpawnChance: 0.08 },    // Fewest dots
-    medium: { dotSpawnChance: 0.15 },  // Normal dots
-    hard: { dotSpawnChance: 0.25 }     // Most dots
+    easy: { dotSpawnChance: 0.06},    // Fewest dots
+    medium: { dotSpawnChance: 0.12 },  // Normal dots
+    hard: { dotSpawnChance: 0.18 }     // Most dots
   };
 
     this.timerEl = document.getElementById("timer");
@@ -198,7 +198,7 @@ class MazeGame {
   // Show winning message
   showWinMessage() {
     if (this.finalScoreEl) {
-      this.finalScoreEl.textContent = this.score;
+      this.finalScoreEl.textContent = this.score + this.timeLeft * 2; // Bonus for time left
     }
     if (this.winMessage) {
       this.winMessage.style.display = 'block';
@@ -221,7 +221,7 @@ class MazeGame {
 
 showGameOver() {
   if (this.finalScoreGameOverEl) {
-    this.finalScoreGameOverEl.textContent = this.score;
+    this.finalScoreGameOverEl.textContent = this.score + this.timeLeft * 2; // Bonus for time left
   }
   if (this.gameOverEl) {
     this.gameOverEl.style.display = 'block';
