@@ -328,6 +328,74 @@
       color: #ff0;
     }
 
+  .difficulty-selector {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+    border: 2px solid #ff0;
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .difficulty-selector:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+    transform: translateY(-2px);
+  }
+
+  .difficulty-selector label {
+    margin-right: 8px;
+    font-weight: bold;
+    color: #ff0;
+    text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+
+  .difficulty-selector select {
+    padding: 6px 12px;
+    border: 1px solid #ff0;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #ff0;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.2);
+  }
+
+  .difficulty-selector select:hover {
+    background: #2a2a2a;
+    box-shadow: 0 0 15px rgba(255, 255, 0, 0.4);
+  }
+
+  .difficulty-selector select:focus {
+    outline: none;
+    border-color: #ffcc00;
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+  }
+
+  /* Optional: Add different colors for each difficulty option */
+  .difficulty-selector option[value="easy"] {
+    background: #27ae60;
+    color: white;
+  }
+
+  .difficulty-selector option[value="medium"] {
+    background: #f39c12;
+    color: white;
+  }
+
+  .difficulty-selector option[value="hard"] {
+    background: #e74c3c;
+    color: white;
+  }
+
   </style>
 </head>
 <body>
@@ -337,6 +405,7 @@
         <div class="score-label">SCORE</div>
         <div class="score-value" id="score">0</div>
       </div>
+
       
       <div class="title">PAC-MAN</div>
       
@@ -391,7 +460,18 @@
   </div>
 
   <!-- Bottom info panels -->
+
+    <div class="difficulty-selector">
+      <label for="difficulty">Difficulty:</label>
+      <select id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+
   <div style="width:100vw; display:flex; justify-content:center; align-items:flex-end; position:fixed; left:0; bottom:0; z-index:100; pointer-events:none;">
+
     <div class="ghost-info" style="position:static; margin:20px; pointer-events:auto;">
       <div style="margin-bottom: 8px; font-weight: bold;">GHOSTS</div>
       <div class="ghost-item">

@@ -19,9 +19,28 @@ class MazeGame {
     this.playAgainButton = document.getElementById("playAgain");
     this.restartButton = document.getElementById("restartGame"); // in game over screen
     
+    // Difficulty elements and setup
+    this.difficultySelect = document.getElementById("difficulty");
+  
+    // Set current difficulty
+    if (this.difficultySelect) {
+      this.difficultySelect.value = this.difficulty;
+      this.difficultySelect.addEventListener("change", (e) => {
+        this.changeDifficulty(e.target.value);
+      });
+    }
+
     // Game state
     this.gameActive = true;
     
+    this.difficulty = localStorage.getItem('pacmanDifficulty') || 'medium'; // 'easy', 'medium', 'hard'
+
+    this.difficultySettings = {
+    easy: { dotSpawnChance: 0.08 },    // Fewest dots
+    medium: { dotSpawnChance: 0.15 },  // Normal dots
+    hard: { dotSpawnChance: 0.25 }     // Most dots
+  };
+
     this.timerEl = document.getElementById("timer");
     this.gameOverEl = document.getElementById("gameOver");
     this.finalScoreGameOverEl = document.getElementById("finalScoreGameOver");
@@ -120,6 +139,18 @@ class MazeGame {
     this.startTimer();
 
   }
+
+  changeDifficulty(newDifficulty) {
+  this.difficulty = newDifficulty;
+  localStorage.setItem('pacmanDifficulty', newDifficulty);
+  
+  // Regenerate dots with new difficulty
+  this.resetGame(); // Reset game to apply new difficulty
+  this.dots = this.generateDots();
+  this.updateDotsLeft();
+  
+  console.log(`Difficulty changed to: ${newDifficulty}, regenerated ${this.dots.length} dots`);
+}
 
   // Count remaining dots
   getRemainingDots() {
@@ -250,9 +281,9 @@ showGameOver() {
   }
 
   generateDots() {
-    const dots = [];
-    const dotRadius = 0.02;
-    const dotSpawnChance = 0.15;
+  const dots = [];
+  const difficultySetting = this.difficultySettings[this.difficulty];
+  const dotSpawnChance = difficultySetting.dotSpawnChance;
 
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
